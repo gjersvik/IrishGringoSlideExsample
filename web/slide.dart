@@ -10,15 +10,40 @@ Map slides = {
 
 void main() {
   var c = querySelector('.container');
+  // toList to get a real list not a HtmlCollection.
+  var pages = c.children.toList();
   
   change(String to){
-    c.innerHtml = slides[to];
-    c.querySelectorAll('button').forEach((Element button){
+    pages[1].innerHtml  = slides[to];
+    pages[1].querySelectorAll('button').forEach((Element button){
       button.onClick.listen((_) => change(button.id));
+    });
+    
+    pages[1].style.left = '0%';
+    pages[0].style.left = '-100%';
+    
+    pages[1].onTransitionEnd.first.then((_){
+      
+      //move page[0] back to start;
+      //removes anim so that elem don't slide over view.
+      pages[0].classes.remove('anim');
+      pages[0].style.left = '100%';
+      pages[0].classes.add('anim');
+      
+      // swap plases [0] is alwayse the one shown.
+      var temp = pages[0];
+      pages[0] = pages[1];
+      pages[1] = temp;
+            
     });
   }
   
-  change('slide1');
+  pages[0].innerHtml  = slides['slide1'];
+  pages[0].querySelectorAll('button').forEach((Element button){
+    button.onClick.listen((_) => change(button.id));
+  });
+  pages[0].style.left = '0%';
+  pages[1].style.left = '100%';
 }
 
 
