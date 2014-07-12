@@ -11,39 +11,46 @@ Map slides = {
 void main() {
   var c = querySelector('.container');
   // toList to get a real list not a HtmlCollection.
-  var pages = c.children.toList();
+  var active = c.children[0];
+  var ready = c.children[1];
   
   change(String to){
-    pages[1].innerHtml  = slides[to];
-    pages[1].querySelectorAll('button').forEach((Element button){
+    // Gives ready new html
+    ready.innerHtml  = slides[to];
+    ready.querySelectorAll('button').forEach((Element button){
       button.onClick.listen((_) => change(button.id));
     });
     
-    pages[1].style.left = '0%';
-    pages[0].style.left = '-100%';
+    // Activate 
+    ready.style.removeProperty('transition-duration');
+    ready.style.left = '0%';
+    active.style.left = '-100%';
     
-    pages[1].onTransitionEnd.first.then((_){
+    ready.onTransitionEnd.first.then((_){
+      // swap active and ready. The animation is done.
+      var temp = ready;
+      ready = active;
+      active = temp;
       
-      //move page[0] back to start;
-      //removes anim so that elem don't slide over view.
-      pages[0].classes.remove('anim');
-      pages[0].style.left = '100%';
-      pages[0].classes.add('anim');
+      //disable transition on ready so i can jump it back to start
+      ready.style.transitionDuration = "0";
+      ready.style.left = '100%';
       
-      // swap plases [0] is alwayse the one shown.
-      var temp = pages[0];
-      pages[0] = pages[1];
-      pages[1] = temp;
+      //Clears readys content
+      ready.innerHtml = '';
             
     });
   }
   
-  pages[0].innerHtml  = slides['slide1'];
-  pages[0].querySelectorAll('button').forEach((Element button){
+  // sets active upp with the fist slide.
+  active.innerHtml  = slides['slide1'];
+  active.querySelectorAll('button').forEach((Element button){
     button.onClick.listen((_) => change(button.id));
   });
-  pages[0].style.left = '0%';
-  pages[1].style.left = '100%';
+  active.style.left = '0%';
+  
+  // move ready to start.
+  ready.style.left = '100%';
 }
 
 
